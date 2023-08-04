@@ -30,11 +30,11 @@ public class DatabaseSQLite extends SQLiteOpenHelper {
     public Boolean insertData(String nombreCompleto, Integer telefono, String usuario, String contraseña, Integer nivelUsuario) {
         SQLiteDatabase MyDatabase = this.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
-        contentValues.put("nombreCompleto", nombreCompleto);
-        contentValues.put("telefono", telefono);
-        contentValues.put("usuario", usuario);
-        contentValues.put("contraseña", contraseña);
-        contentValues.put("nivelUsuario", nivelUsuario);
+        contentValues.put("nombreCompleto", "nombreCompleto");
+        contentValues.put("telefono", 1112223344);
+        contentValues.put("usuario", "admin");
+        contentValues.put("contraseña", "12345");
+        contentValues.put("nivelUsuario", 1);
         long result = -1;
         try {
             result = MyDatabase.insert("Usuario", null, contentValues);

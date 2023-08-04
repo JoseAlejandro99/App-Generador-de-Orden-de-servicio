@@ -25,13 +25,6 @@ public class LoginActivity extends AppCompatActivity {
         botonLogin = findViewById(R.id.boton_login);
         database = new DatabaseSQLite(this);
 
-        // Agregar un nuevo usuario a la base de datos
-        Boolean result = database.insertData("Administrador", 1234567890, "admin", "12345", 1);
-        if (result) {
-            Toast.makeText(LoginActivity.this, "New user added successfully!", Toast.LENGTH_SHORT).show();
-        } else {
-            Toast.makeText(LoginActivity.this, "Failed to add new user", Toast.LENGTH_SHORT).show();
-        }
 
         botonLogin.setOnClickListener(new View.OnClickListener() {
             @Override
