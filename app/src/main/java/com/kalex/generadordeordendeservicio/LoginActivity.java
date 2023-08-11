@@ -13,7 +13,7 @@ public class LoginActivity extends AppCompatActivity {
     private EditText login_user;
     private EditText login_password;
     private Button botonLogin;
-    private DatabaseSQLite database;
+    private DatabaseHelper databaseHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -23,8 +23,7 @@ public class LoginActivity extends AppCompatActivity {
         login_user = findViewById(R.id.login_user);
         login_password = findViewById(R.id.login_password);
         botonLogin = findViewById(R.id.boton_login);
-        database = new DatabaseSQLite(this);
-
+        databaseHelper = new DatabaseHelper(this);
 
         botonLogin.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -33,16 +32,14 @@ public class LoginActivity extends AppCompatActivity {
                 String contraseña = login_password.getText().toString();
 
                 if (usuario.isEmpty() || contraseña.isEmpty()) {
-                    Toast.makeText(LoginActivity.this, "All fields are mandatory", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(LoginActivity.this, "Ingresa los datos que se te piden", Toast.LENGTH_SHORT).show();
                 } else {
-                    boolean credentialsMatch = database.checkUsuarioContraseña(usuario, contraseña);
-
-                    if (credentialsMatch) {
-                        Toast.makeText(LoginActivity.this, "Login Successfully!", Toast.LENGTH_SHORT).show();
+                    if (databaseHelper.checkUserCredentials(usuario, contraseña)) {
+                        Toast.makeText(LoginActivity.this, "Inicio de sesión exitoso", Toast.LENGTH_SHORT).show();
                         Intent intent = new Intent(LoginActivity.this, Activity_Principal.class);
                         startActivity(intent);
                     } else {
-                        Toast.makeText(LoginActivity.this, "Invalid Credentials", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(LoginActivity.this, "Credenciales incorrectas", Toast.LENGTH_SHORT).show();
                     }
                 }
             }
