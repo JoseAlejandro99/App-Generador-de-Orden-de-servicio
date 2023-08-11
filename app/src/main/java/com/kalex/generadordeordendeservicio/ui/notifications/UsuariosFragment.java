@@ -5,15 +5,24 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ImageButton;
 
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.kalex.generadordeordendeservicio.R;
 import com.kalex.generadordeordendeservicio.SignUpActivity;
+import com.kalex.generadordeordendeservicio.Usuario;
+import com.kalex.generadordeordendeservicio.DatabaseHelper;
+import com.kalex.generadordeordendeservicio.usuario_item;
+
+import java.util.List;
 
 public class UsuariosFragment extends Fragment {
+
+    private RecyclerView recyclerView;
+    private usuario_item usuarioAdapter;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -24,13 +33,21 @@ public class UsuariosFragment extends Fragment {
         buttonAgregar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // Iniciar la actividad SignUpActivity
                 Intent intent = new Intent(getActivity(), SignUpActivity.class);
                 startActivity(intent);
             }
         });
 
+        recyclerView = rootView.findViewById(R.id.listaUsuario);
+        recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        DatabaseHelper databaseHelper = new DatabaseHelper(getActivity());
+        List<Usuario> usuarios = databaseHelper.getAllUsuarios();
+        usuarioAdapter = new usuario_item(usuarios);
+        recyclerView.setAdapter(usuarioAdapter);
+
         return rootView;
     }
-
 }
+
+
+

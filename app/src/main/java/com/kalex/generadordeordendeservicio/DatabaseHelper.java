@@ -5,6 +5,9 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class DatabaseHelper extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "TallerMecanico.db";
@@ -63,4 +66,29 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         cursor.close();
         return count > 0;
     }
+
+    public List<Usuario> getAllUsuarios() {
+        List<Usuario> usuarios = new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        Cursor cursor = db.query(TABLE_USERS, null, null, null, null, null, null);
+
+        if (cursor != null) {
+            while (cursor.moveToNext()) {
+                int id = cursor.getInt(cursor.getColumnIndex(COLUMN_ID));
+                String nombreCompleto = cursor.getString(cursor.getColumnIndex(COLUMN_FULL_NAME));
+                int telefono = cursor.getInt(cursor.getColumnIndex(COLUMN_PHONE));
+                String usuario = cursor.getString(cursor.getColumnIndex(COLUMN_USERNAME));
+                String contraseña = cursor.getString(cursor.getColumnIndex(COLUMN_PASSWORD));
+                int nivelUsuario = cursor.getInt(cursor.getColumnIndex(COLUMN_USER_LEVEL));
+
+                Usuario usuarioObj = new Usuario(id, nombreCompleto, telefono, usuario, contraseña, nivelUsuario);
+                usuarios.add(usuarioObj);
+            }
+            cursor.close();
+        }
+
+        return usuarios;
+    }
+
 }
