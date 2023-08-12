@@ -8,8 +8,6 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.kalex.generadordeordendeservicio.Usuario;
-
 import java.util.List;
 
 public class usuario_item extends RecyclerView.Adapter<usuario_item.UsuarioViewHolder> {
@@ -18,6 +16,12 @@ public class usuario_item extends RecyclerView.Adapter<usuario_item.UsuarioViewH
 
     public usuario_item(List<Usuario> usuarioList) {
         this.usuarioList = usuarioList;
+    }
+
+    public void setData(List<Usuario> nuevosUsuarios) {
+        usuarioList.clear();
+        usuarioList.addAll(nuevosUsuarios);
+        notifyDataSetChanged();
     }
 
     @NonNull

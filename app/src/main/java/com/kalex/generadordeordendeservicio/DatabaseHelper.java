@@ -1,4 +1,5 @@
 package com.kalex.generadordeordendeservicio;
+
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -25,7 +26,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             "CREATE TABLE " + TABLE_USERS + " (" +
                     COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
                     COLUMN_FULL_NAME + " TEXT, " +
-                    COLUMN_PHONE + " INTEGER, " +
+                    COLUMN_PHONE + " LONG, " +
                     COLUMN_USERNAME + " TEXT NOT NULL, " +
                     COLUMN_PASSWORD + " TEXT NOT NULL, " +
                     COLUMN_USER_LEVEL + " INTEGER)";
@@ -56,6 +57,19 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.insert(TABLE_USERS, null, values);
     }
 
+    public long insertUser(String nombreCompleto, long telefono, String usuario, String contraseña, int nivelUsuario) {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+        values.put(COLUMN_FULL_NAME, nombreCompleto);
+        values.put(COLUMN_PHONE, telefono);
+        values.put(COLUMN_USERNAME, usuario);
+        values.put(COLUMN_PASSWORD, contraseña);
+        values.put(COLUMN_USER_LEVEL, nivelUsuario);
+
+        return db.insert(TABLE_USERS, null, values);
+    }
+
     public boolean checkUserCredentials(String username, String password) {
         SQLiteDatabase db = this.getReadableDatabase();
         String[] projection = {COLUMN_ID};
@@ -74,15 +88,22 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         Cursor cursor = db.query(TABLE_USERS, null, null, null, null, null, null);
 
         if (cursor != null) {
-            while (cursor.moveToNext()) {
-                int id = cursor.getInt(cursor.getColumnIndex(COLUMN_ID));
-                String nombreCompleto = cursor.getString(cursor.getColumnIndex(COLUMN_FULL_NAME));
-                int telefono = cursor.getInt(cursor.getColumnIndex(COLUMN_PHONE));
-                String usuario = cursor.getString(cursor.getColumnIndex(COLUMN_USERNAME));
-                String contraseña = cursor.getString(cursor.getColumnIndex(COLUMN_PASSWORD));
-                int nivelUsuario = cursor.getInt(cursor.getColumnIndex(COLUMN_USER_LEVEL));
+            int idIndex = cursor.getColumnIndex(COLUMN_ID);
+            int nombreIndex = cursor.getColumnIndex(COLUMN_FULL_NAME);
+            int telefonoIndex = cursor.getColumnIndex(COLUMN_PHONE);
+            int usuarioIndex = cursor.getColumnIndex(COLUMN_USERNAME);
+            int contraseñaIndex = cursor.getColumnIndex(COLUMN_PASSWORD);
+            int nivelUsuarioIndex = cursor.getColumnIndex(COLUMN_USER_LEVEL);
 
-                Usuario usuarioObj = new Usuario(id, nombreCompleto, telefono, usuario, contraseña, nivelUsuario);
+            while (cursor.moveToNext()) {
+                int id = cursor.getInt(idIndex);
+                String nombreCompleto = cursor.getString(nombreIndex);
+                long telefono = cursor.getLong(telefonoIndex);
+                String usuario = cursor.getString(usuarioIndex);
+                String contraseña = cursor.getString(contraseñaIndex);
+                int nivelUsuario = cursor.getInt(nivelUsuarioIndex);
+
+                Usuario usuarioObj = new Usuario(id, nombreCompleto, (int) telefono, usuario, contraseña, nivelUsuario);
                 usuarios.add(usuarioObj);
             }
             cursor.close();
@@ -90,5 +111,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         return usuarios;
     }
+
 
 }

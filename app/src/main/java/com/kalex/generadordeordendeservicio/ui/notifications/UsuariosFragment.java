@@ -23,6 +23,7 @@ public class UsuariosFragment extends Fragment {
 
     private RecyclerView recyclerView;
     private usuario_item usuarioAdapter;
+    private DatabaseHelper databaseHelper;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -40,14 +41,30 @@ public class UsuariosFragment extends Fragment {
 
         recyclerView = rootView.findViewById(R.id.listaUsuario);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-        DatabaseHelper databaseHelper = new DatabaseHelper(getActivity());
-        List<Usuario> usuarios = databaseHelper.getAllUsuarios();
-        usuarioAdapter = new usuario_item(usuarios);
-        recyclerView.setAdapter(usuarioAdapter);
+        databaseHelper = new DatabaseHelper(getActivity());
+        updateUsuarioList();
 
         return rootView;
     }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        updateUsuarioList();
+    }
+
+    private void updateUsuarioList() {
+        List<Usuario> usuarios = databaseHelper.getAllUsuarios();
+        if (usuarioAdapter == null) {
+            usuarioAdapter = new usuario_item(usuarios);
+            recyclerView.setAdapter(usuarioAdapter);
+        } else {
+            usuarioAdapter.setData(usuarios);
+            usuarioAdapter.notifyDataSetChanged();
+        }
+    }
 }
+
 
 
 
