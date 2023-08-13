@@ -1,260 +1,177 @@
 package com.kalex.generadordeordendeservicio.ui.home;
 
-import com.itextpdf.kernel.pdf.PdfDocument;
-import com.itextpdf.kernel.pdf.PdfWriter;
-import com.itextpdf.layout.Document;
-import com.itextpdf.layout.element.Paragraph;
-
 import android.Manifest;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
 import android.net.Uri;
-import android.os.Environment;
-import android.provider.MediaStore;
 import android.os.Bundle;
-import android.util.Log;
+import android.os.Environment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.CheckBox;
-import android.widget.ImageButton;
+import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.SeekBar;
-import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
+import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
-import com.kalex.generadordeordendeservicio.R;
 
+import com.itextpdf.kernel.pdf.PdfDocument;
+import com.itextpdf.kernel.pdf.PdfWriter;
+import com.itextpdf.layout.Document;
+import com.itextpdf.layout.element.Paragraph;
+import com.kalex.generadordeordendeservicio.R;
 import java.io.File;
+import java.io.IOException;
 
 public class InicioFragment extends Fragment {
 
-        private static final int REQUEST_IMAGE_CAPTURE = 1;
-        private static final int REQUEST_CAMERA_PERMISSION = 2;
-        private ImageView currentImageView;
+    private EditText txtFolio;
+    private EditText txtMarca;
+    private EditText txtModelo;
+    private EditText txtColor;
+    private EditText txtKilometraje;
+    private EditText txtPlacas;
+    private EditText DateIngreso;
+    private EditText DateSalida;
+    private EditText txtNombre;
+    private EditText txtTelefono;
+    private EditText txtEmail;
+    private  EditText txtObservaciones;
+    private EditText txtNumerodeserie;
+    private ImageView imgLadoderecho, imgLadoizquierdo, imgFrente, imgDetras;
+    private Button botonOrdendeservicio;
 
-        // Variables para las vistas
-        private TextView txtFolio, txtMarca, txtModelo, textColor, txtKilometraje, txtPlacas,
-                txtNumerodeserie, DateIngreso, DateSalida, txtNombre, txtTelefono, txtEmail,
-                texCantidad, txtDescripciontrabajo, txtCosto, txtObservaciones;
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View rootView = inflater.inflate(R.layout.fragment_inicio, container, false);
 
-        private SeekBar seekBar;
-        private TextView textViewSeekBarValue;
+        txtFolio = rootView.findViewById(R.id.txtFolio);
+        txtMarca = rootView.findViewById(R.id.txtMarca);
+        txtModelo = rootView.findViewById(R.id.txtModelo);
+        txtColor = rootView.findViewById(R.id.txtColor);
+        txtKilometraje = rootView.findViewById(R.id.txtKilometraje);
+        txtPlacas = rootView.findViewById(R.id.txtPlacas);
+        txtNumerodeserie = rootView.findViewById(R.id.txtNumerodeserie);
 
-        // Variables para los CheckBoxes
-        private CheckBox checkBox1, checkBox2, checkBox3, checkBox4, checkBox5, checkBox6, checkBox7,
-                checkBox8, checkBox9, checkBox10, checkBox11, checkBox12, checkBox13, checkBox14, checkBox15, checkBox16;
+        DateIngreso = rootView.findViewById(R.id.DateIngreso);
+        DateSalida = rootView.findViewById(R.id.DateSalida);
+        txtNombre = rootView.findViewById(R.id.txtNombre);
+        txtTelefono = rootView.findViewById(R.id.txtTelefono);
+        txtEmail = rootView.findViewById(R.id.txtEmail);
 
-        // Variables para los ImageButtons
-        private ImageButton botonLadoderecho, BotonLadoizquierdo, botonFrente, botonDetras;
+        txtObservaciones = rootView.findViewById(R.id.txtObservaciones);
 
-        // Variables para los ImageViews
-        private ImageView imgLadoderecho, imgLadoizquierdo, imgFrente, imgDetras;
 
-        // Variables para el Button
-        private Button botoOrdendeservicio;
 
-        @Override
-        public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-            View rootView = inflater.inflate(R.layout.fragment_inicio, container, false);
 
-                // Inicializar las vistas usando findViewById
-                txtFolio = rootView.findViewById(R.id.txtFolio);
-                txtMarca = rootView.findViewById(R.id.txtMarca);
-                txtModelo = rootView.findViewById(R.id.txtModelo);
-                textColor = rootView.findViewById(R.id.textColor);
-                txtKilometraje = rootView.findViewById(R.id.txtKilometraje);
-                txtPlacas = rootView.findViewById(R.id.txtPlacas);
-                txtNumerodeserie = rootView.findViewById(R.id.txtNumerodeserie);
-                DateIngreso = rootView.findViewById(R.id.DateIngreso);
-                DateSalida = rootView.findViewById(R.id.DateSalida);
-                txtNombre = rootView.findViewById(R.id.txtNombre);
-                txtTelefono = rootView.findViewById(R.id.txtTelefono);
-                txtEmail = rootView.findViewById(R.id.txtEmail);
-                texCantidad = rootView.findViewById(R.id.texCantidad);
-                txtDescripciontrabajo = rootView.findViewById(R.id.txtDescripciontrabajo);
-                txtCosto = rootView.findViewById(R.id.txtCosto);
-                txtObservaciones = rootView.findViewById(R.id.txtObservaciones);
 
-                // Inicializar los CheckBoxes
-                checkBox1 = rootView.findViewById(R.id.checkBox1);
-                checkBox2 = rootView.findViewById(R.id.checkBox2);
-                checkBox3 = rootView.findViewById(R.id.checkBox3);
-                checkBox4 = rootView.findViewById(R.id.checkBox4);
-                checkBox5 = rootView.findViewById(R.id.checkBox5);
-                checkBox6 = rootView.findViewById(R.id.checkBox6);
-                checkBox7 = rootView.findViewById(R.id.checkBox7);
-                checkBox8 = rootView.findViewById(R.id.checkBox8);
-                checkBox9 = rootView.findViewById(R.id.checkBox9);
-                checkBox10 = rootView.findViewById(R.id.checkBox10);
-                checkBox11 = rootView.findViewById(R.id.checkBox11);
-                checkBox12 = rootView.findViewById(R.id.checkBox12);
-                checkBox13 = rootView.findViewById(R.id.checkBox13);
-                checkBox14 = rootView.findViewById(R.id.checkBox14);
-                checkBox15 = rootView.findViewById(R.id.checkBox15);
-                checkBox16 = rootView.findViewById(R.id.checkBox16);
 
-                // Inicializar los ImageButtons
-                botonLadoderecho = rootView.findViewById(R.id.botonLadoderecho);
-                BotonLadoizquierdo = rootView.findViewById(R.id.BotonLadoizquierdo);
-                botonFrente = rootView.findViewById(R.id.botonFrente);
-                botonDetras = rootView.findViewById(R.id.botonDetras);
+        botonOrdendeservicio = rootView.findViewById(R.id.botonOrdendeservicio);
 
-                // Inicializar los ImageViews
-                imgLadoderecho = rootView.findViewById(R.id.imgLadoderecho);
-                imgLadoizquierdo = rootView.findViewById(R.id.imgLadoizquierdo);
-                imgFrente = rootView.findViewById(R.id.imgFrente);
-                imgDetras = rootView.findViewById(R.id.imgDetras);
-
-                // Inicializar el Button
-                botoOrdendeservicio = rootView.findViewById(R.id.botoOrdendeservicio);
-                botoOrdendeservicio.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        generatePdf();
-                    }
-                });
-
-                // Inicializar el SeekBar y TextView
-                seekBar = rootView.findViewById(R.id.seekBar);
-                textViewSeekBarValue = rootView.findViewById(R.id.textViewSeekBarValue);
-
-                seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-                    @Override
-                    public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                        String progressText = progress + "%";
-                        textViewSeekBarValue.setText(progressText);
-                    }
-
-                    @Override
-                    public void onStartTrackingTouch(SeekBar seekBar) {
-                        // No se necesita implementación aquí
-                    }
-
-                    @Override
-                    public void onStopTrackingTouch(SeekBar seekBar) {
-                        // No se necesita implementación aquí
-                    }
-                });
-
-                setupCaptureButton(botonLadoderecho, imgLadoderecho);
-                setupCaptureButton(BotonLadoizquierdo, imgLadoizquierdo);
-                setupCaptureButton(botonFrente, imgFrente);
-                setupCaptureButton(botonDetras, imgDetras);
-
-            return rootView;
-        }
-
-    private void generatePdf() {
-        String folderName = "OrdenDeServicio";
-        File externalFilesDir = requireContext().getExternalFilesDir(null);
-        File pdfFolder = new File(externalFilesDir, folderName);
-
-        if (!pdfFolder.exists()) {
-            if (!pdfFolder.mkdirs()) {
-                Log.e("PDFGeneration", "No se pudo crear el directorio");
-                return;
+        botonOrdendeservicio.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                generateAndSavePDF();
             }
+        });
+
+        return rootView;
+    }
+
+    private void generateAndSavePDF() {
+        if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(requireActivity(), new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
+        } else {
+            createPDF();
         }
+    }
 
-        if (!pdfFolder.canWrite()) {
-            Log.e("PDFGeneration", "No se puede escribir en el directorio");
-            return;
-        }
-
-        String fileName = txtFolio.getText().toString() + ".pdf";
-
-        // Crear la ruta completa del archivo PDF dentro del directorio
-        String pdfPath = new File(pdfFolder, fileName).getAbsolutePath();
-
+    private void createPDF() {
         try {
-            PdfWriter writer = new PdfWriter(pdfPath);
-            PdfDocument pdf = new PdfDocument(writer);
-            Document document = new Document(pdf);
+            String folderPath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).toString() + "/OrdenDeServicio";
+            File folder = new File(folderPath);
+            if (!folder.exists()) {
+                folder.mkdirs();
+            }
 
-            // Agregar los datos de los EditText al PDF
+            String fileName = txtFolio.getText().toString() + ".pdf";
+            String filePath = folderPath + "/" + fileName;
+
+            PdfWriter pdfWriter = new PdfWriter(filePath);
+            PdfDocument pdfDocument = new PdfDocument(pdfWriter);
+            Document document = new Document(pdfDocument);
+
+            // Contenido de pdf
+            document.add(new Paragraph("Orden de Servicio"));
+            document.add(new Paragraph("Taller Mecanico"));
+            document.add(new Paragraph("Mcqueen"));
+
             document.add(new Paragraph("Folio: " + txtFolio.getText().toString()));
-            // Agregar más campos de EditText aquí...
+
+            document.add(new Paragraph("DATOS DEL VEHICULO"));
+            document.add(new Paragraph("Marca: "+ txtMarca.getText().toString()));
+            document.add(new Paragraph("Modelo: "+ txtModelo.getText().toString()));
+            document.add(new Paragraph("Color: "+ txtColor.getText().toString()));
+            document.add(new Paragraph("Kilometraje: "+ txtKilometraje.getText().toString()+" KM"));
+            document.add(new Paragraph("Placas: "+ txtPlacas.getText().toString()));
+            document.add(new Paragraph("Numero de serie: "+ txtNumerodeserie.getText().toString()));
+
+            document.add(new Paragraph("DATOS DEL CLIENTE"));
+            document.add(new Paragraph("Ingreso: "+ DateIngreso.getText().toString()));
+            document.add(new Paragraph("Salida: "+ DateSalida.getText().toString()));
+            document.add(new Paragraph("Ingreso: "+ txtNombre.getText().toString()));
+            document.add(new Paragraph("Ingreso: "+ txtTelefono.getText().toString()));
+            document.add(new Paragraph("Ingreso: "+ txtEmail.getText().toString()));
+
+            document.add(new Paragraph("DESCRIPCION DEL TRABAJO"));
+
+            document.add(new Paragraph("OBSERVACIONES"));
+            document.add(new Paragraph(txtObservaciones.getText().toString()));
+
+            document.add(new Paragraph("INVENTARIO"));
+
+            document.add(new Paragraph("DAÑOS PREEXISTENTES EN EL VEHICULO"));
+            document.add(new Paragraph("Lado derecho"));
+            document.add(new Paragraph("Lado izquierdo"));
+            document.add(new Paragraph("Frente"));
+            document.add(new Paragraph("Detras"));
+
+            document.add(new Paragraph("Ampliación Ejido San Fco. S/N, Monte Hermón, 41304 Tlapa, Gro."));
+
+
+
 
             document.close();
 
-            // Mostrar un mensaje de éxito o hacer alguna otra acción
-            Toast.makeText(getActivity(), "PDF generado correctamente", Toast.LENGTH_SHORT).show();
+            openPDF(filePath);
 
-            // Abrir el archivo PDF utilizando una aplicación de visualización de PDF
-            openPdf(pdfPath);
-        } catch (Exception e) {
+        } catch (IOException e) {
             e.printStackTrace();
-            Toast.makeText(getActivity(), "Error al generar el PDF", Toast.LENGTH_SHORT).show();
         }
     }
 
-    private void openPdf(String pdfPath) {
-        File pdfFile = new File(pdfPath);
-        if (pdfFile.exists()) {
-            Uri pdfUri = FileProvider.getUriForFile(requireContext(), "com.example.appname.fileprovider", pdfFile);
+    private void openPDF(String filePath) {
+        File file = new File(filePath);
+        if (file.exists()) {
+            Uri pdfUri = FileProvider.getUriForFile(requireContext(), "com.kalex.generadordeordendeservicio.fileprovider", file);
             Intent intent = new Intent(Intent.ACTION_VIEW);
             intent.setDataAndType(pdfUri, "application/pdf");
-            intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-            startActivity(intent);
-        } else {
-            Toast.makeText(getActivity(), "El archivo PDF no existe", Toast.LENGTH_SHORT).show();
-        }
-    }
+            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION); // Importante para otorgar permisos
 
-
-
-
-    private void setupCaptureButton(ImageButton button, ImageView imageView) {
-            button.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    currentImageView = imageView;
-                    dispatchTakePictureIntent();
-                }
-            });
-        }
-
-        private void requestCameraPermission() {
-            if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
-                requestPermissions(new String[]{Manifest.permission.CAMERA}, REQUEST_CAMERA_PERMISSION);
-            } else {
-                dispatchTakePictureIntent();
-            }
-        }
-
-        private void dispatchTakePictureIntent() {
-            Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-            if (takePictureIntent.resolveActivity(getActivity().getPackageManager()) != null) {
-                startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
-            }
-        }
-
-        @Override
-        public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-            if (requestCode == REQUEST_CAMERA_PERMISSION) {
-                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    dispatchTakePictureIntent();
-                } else {
-                    // Handle permission denied case
-                }
-            }
-        }
-
-        @Override
-        public void onActivityResult(int requestCode, int resultCode, Intent data) {
-            super.onActivityResult(requestCode, resultCode, data);
-            if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == getActivity().RESULT_OK) {
-                Bundle extras = data.getExtras();
-                Bitmap imageBitmap = (Bitmap) extras.get("data");
-                currentImageView.setImageBitmap(imageBitmap);
+            try {
+                startActivity(intent);
+            } catch (ActivityNotFoundException e) {
+                Toast.makeText(requireContext(), "No se encontró una aplicación para abrir archivos PDF", Toast.LENGTH_SHORT).show();
             }
         }
     }
+
+
+
+}
