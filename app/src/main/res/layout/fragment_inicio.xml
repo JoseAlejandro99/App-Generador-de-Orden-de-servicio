@@ -142,6 +142,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:ems="10"
+            android:hint="Dia/Mes/Año"
             android:inputType="date" />
 
         <TextView
@@ -155,6 +156,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:ems="10"
+            android:hint="Dia/Mes/Año"
             android:inputType="date" />
 
         <TextView
@@ -181,6 +183,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:ems="10"
+            android:hint="xxx-xxx-xx-xx"
             android:inputType="phone" />
 
         <TextView

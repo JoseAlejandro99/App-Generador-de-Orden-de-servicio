@@ -41,6 +41,8 @@ import com.itextpdf.layout.element.Cell;
 import com.itextpdf.layout.element.Div;
 import com.itextpdf.layout.element.Paragraph;
 import com.itextpdf.layout.element.Table;
+import com.itextpdf.layout.property.HorizontalAlignment;
+import com.itextpdf.layout.property.TextAlignment;
 import com.itextpdf.layout.property.UnitValue;
 import com.kalex.generadordeordendeservicio.R;
 
@@ -184,6 +186,61 @@ public class InicioFragment extends Fragment {
         return rootView;
     }
 
+    private boolean validarCampos() {
+        String[] campos = {
+                txtFolio.getText().toString(),
+                txtMarca.getText().toString(),
+                txtModelo.getText().toString(),
+                txtColor.getText().toString(),
+                txtKilometraje.getText().toString(),
+                txtPlacas.getText().toString(),
+                txtNumerodeserie.getText().toString(),
+                DateIngreso.getText().toString(),
+                DateSalida.getText().toString(),
+                txtNombre.getText().toString(),
+                txtTelefono.getText().toString(),
+                txtCantidad.getText().toString(),
+                txtDescripciontrabajo.getText().toString(),
+                txtCosto.getText().toString()
+        };
+
+        String[] nombresCampos = {
+                "Folio",
+                "Marca",
+                "Modelo",
+                "Color",
+                "Kilometraje",
+                "Placas",
+                "Número de serie",
+                "Fecha de Ingreso",
+                "Fecha de Salida",
+                "Nombre",
+                "Teléfono",
+                "Cantidad",
+                "Descripción del Trabajo",
+                "Costo"
+        };
+
+        StringBuilder camposFaltantes = new StringBuilder();
+
+        boolean camposValidos = true;
+
+        for (int i = 0; i < campos.length; i++) {
+            if (campos[i].isEmpty()) {
+                camposFaltantes.append("- ").append(nombresCampos[i]).append("\n");
+                camposValidos = false;
+            }
+        }
+
+        if (!camposValidos) {
+            String mensaje = "Por favor, rellene los siguientes campos:\n" + camposFaltantes.toString();
+            Toast.makeText(requireContext(), mensaje, Toast.LENGTH_LONG).show();
+        }
+
+        return camposValidos;
+    }
+
+
     private void verificarYTomarFoto() {
         if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(requireActivity(), new String[]{Manifest.permission.CAMERA}, CODIGO_SOLICITUD_PERMISO_CAMARA);
@@ -256,13 +313,20 @@ public class InicioFragment extends Fragment {
         if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(requireActivity(), new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
         } else {
-            if (todasLasImagenesTomadas) {
+            if (todasLasImagenesTomadas && validarCampos()) {
                 createPDF();
-            } else {
-                Toast.makeText(requireContext(), "Por favor, tome las fotos de los 4 angulos", Toast.LENGTH_SHORT).show();
+            } else if (!todasLasImagenesTomadas) {
+                Toast.makeText(requireContext(), "Por favor, tome las fotos de los 4 ángulos", Toast.LENGTH_SHORT).show();
             }
         }
     }
+    private Paragraph createCenteredParagraph(String text) {
+        Paragraph paragraph = new Paragraph(text);
+        paragraph.setTextAlignment(TextAlignment.CENTER);
+        return paragraph;
+    }
+
+
 
     private void createPDF() {
         try {
@@ -284,14 +348,15 @@ public class InicioFragment extends Fragment {
 
             // Crear una tabla con 3 filas y 3 columnas
             Table table1 = new Table(UnitValue.createPercentArray(new float[]{1, 1, 1}));
+            table1.setBorder(Border.NO_BORDER);
 
             // Agregar celdas a la tabla
             table1.addCell("");
-            table1.addCell("Orden de servicio");
-            table1.addCell("Folio: " + txtFolio.getText().toString());
+            table1.addCell(createCenteredParagraph("Orden de servicio")).setHorizontalAlignment(HorizontalAlignment.CENTER);
+            table1.addCell(createCenteredParagraph("Folio: " + txtFolio.getText().toString())).setHorizontalAlignment(HorizontalAlignment.CENTER);
 
             table1.addCell("");
-            table1.addCell("Taller Mecanico Mcqueen");
+            table1.addCell(createCenteredParagraph("Taller Mecanico Mcqueen")).setHorizontalAlignment(HorizontalAlignment.CENTER);
             table1.addCell("");
 
             table1.setWidth(UnitValue.createPercentValue(100));
@@ -304,8 +369,8 @@ public class InicioFragment extends Fragment {
             Table table2 = new Table(UnitValue.createPercentArray(new float[]{1, 1}));
 
             // Agregar celdas a la tabla
-            table2.addCell("DATOS DEL VEHICULO");
-            table2.addCell("DATOS DEL CLIENTE");
+            table2.addCell(createCenteredParagraph("DATOS DEL VEHICULO")).setHorizontalAlignment(HorizontalAlignment.CENTER);
+            table2.addCell(createCenteredParagraph("DATOS DEL CLIENTE")).setHorizontalAlignment(HorizontalAlignment.CENTER);
             table2.addCell("Marca: " + txtMarca.getText().toString());
             table2.addCell("Ingreso: " + DateIngreso.getText().toString());
             table2.addCell("Modelo: " + txtModelo.getText().toString() + "Color: " + " " + txtColor.getText().toString());
@@ -327,10 +392,10 @@ public class InicioFragment extends Fragment {
             Table table3 = new Table(4);
 
             // Agregar celdas a la tabla
-            table3.addCell("CANTIDAD");
-            table3.addCell("DESCRIPCION DEL TRABAJO");
-            table3.addCell("COSTO");
-            table3.addCell("IMPORTE");
+            table3.addCell(createCenteredParagraph("CANTIDAD")).setHorizontalAlignment(HorizontalAlignment.CENTER);
+            table3.addCell(createCenteredParagraph("DESCRIPCION DEL TRABAJO")).setHorizontalAlignment(HorizontalAlignment.CENTER);
+            table3.addCell(createCenteredParagraph("COSTO")).setHorizontalAlignment(HorizontalAlignment.CENTER);
+            table3.addCell(createCenteredParagraph("IMPORTE")).setHorizontalAlignment(HorizontalAlignment.CENTER);
 
             table3.addCell(txtCantidad.getText().toString());
             table3.addCell(txtDescripciontrabajo.getText().toString());
@@ -364,8 +429,8 @@ public class InicioFragment extends Fragment {
 
             // Agregar celdas a la tabla
 
-            table4.addCell("OBSERVACIONES");
-            table4.addCell(txtObservaciones.getText().toString());
+            table4.addCell(createCenteredParagraph("OBSERVACIONES")).setHorizontalAlignment(HorizontalAlignment.CENTER);
+            table4.addCell(""+txtObservaciones.getText().toString());
 
             table4.setWidth(UnitValue.createPercentValue(100));
 
@@ -378,7 +443,7 @@ public class InicioFragment extends Fragment {
 
             // Agregar celdas a la tabla
 
-            table5.addCell("INVENTARIO");
+            table5.addCell(createCenteredParagraph("INVENTARIO")).setHorizontalAlignment(HorizontalAlignment.CENTER);
 
             table5.setWidth(UnitValue.createPercentValue(100));
 
@@ -453,7 +518,7 @@ public class InicioFragment extends Fragment {
 
             // Agregar celdas a la tabla
 
-            table7.addCell("El nivel de gasolina es: " + seekBar.getProgress() + "%");
+            table7.addCell(createCenteredParagraph("El nivel de gasolina es: " + seekBar.getProgress() + "%")).setHorizontalAlignment(HorizontalAlignment.CENTER);
 
             table7.setWidth(UnitValue.createPercentValue(100));
 
@@ -465,7 +530,7 @@ public class InicioFragment extends Fragment {
 
             // Agregar celdas a la tabla
 
-            table8.addCell("DAÑOS PREEXISTENTES EN EL VEHICULO");
+            table8.addCell(createCenteredParagraph("DAÑOS PREEXISTENTES EN EL VEHICULO")).setHorizontalAlignment(HorizontalAlignment.CENTER);
 
             table8.setWidth(UnitValue.createPercentValue(100));
 
@@ -477,10 +542,10 @@ public class InicioFragment extends Fragment {
 
             // Agregar celdas a la tabla
 
-            table9.addCell("Lado derecho");
-            table9.addCell("Lado izquierdo");
-            table9.addCell("Frente");
-            table9.addCell("Detras");
+            table9.addCell(createCenteredParagraph("Lado derecho")).setHorizontalAlignment(HorizontalAlignment.CENTER);
+            table9.addCell(createCenteredParagraph("Lado izquierdo")).setHorizontalAlignment(HorizontalAlignment.CENTER);
+            table9.addCell(createCenteredParagraph("Frente")).setHorizontalAlignment(HorizontalAlignment.CENTER);
+            table9.addCell(createCenteredParagraph("Detras")).setHorizontalAlignment(HorizontalAlignment.CENTER);
 
             agregarImagenACelda(table9, imgLadoderecho, 0.6f, 0.6f);
             agregarImagenACelda(table9, imgLadoizquierdo, 0.6f, 0.6f);
@@ -497,8 +562,8 @@ public class InicioFragment extends Fragment {
 
             // Agregar celdas a la tabla
 
-            table10.addCell("\n____________________________\n" + "Dueño del taller mecanico");
-            table10.addCell("\n____________________________\n" + txtNombre.getText().toString());
+            table10.addCell(createCenteredParagraph("\n____________________________\n" + "Dueño del taller mecanico")).setHorizontalAlignment(HorizontalAlignment.CENTER);
+            table10.addCell(createCenteredParagraph("\n____________________________\n" + txtNombre.getText().toString())).setHorizontalAlignment(HorizontalAlignment.CENTER);
 
             table10.setWidth(UnitValue.createPercentValue(100));
 
@@ -511,7 +576,7 @@ public class InicioFragment extends Fragment {
 
             // Agregar celdas a la tabla
 
-            table11.addCell("Ampliación Ejido San Fco. S/N, Monte Hermón, 41304 Tlapa, Gro.");
+            table11.addCell(createCenteredParagraph("Ampliación Ejido San Fco. S/N, Monte Hermón, 41304 Tlapa, Gro.")).setHorizontalAlignment(HorizontalAlignment.CENTER);
 
             table11.setWidth(UnitValue.createPercentValue(100));
 
