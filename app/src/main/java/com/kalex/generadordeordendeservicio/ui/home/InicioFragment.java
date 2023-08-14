@@ -23,17 +23,27 @@ import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
+
 import com.itextpdf.io.image.ImageDataFactory;
+import com.itextpdf.kernel.colors.ColorConstants;
 import com.itextpdf.kernel.pdf.PdfDocument;
 import com.itextpdf.kernel.pdf.PdfWriter;
 import com.itextpdf.layout.Document;
+import com.itextpdf.layout.borders.Border;
+import com.itextpdf.layout.borders.SolidBorder;
+import com.itextpdf.layout.element.Cell;
+import com.itextpdf.layout.element.Div;
 import com.itextpdf.layout.element.Paragraph;
+import com.itextpdf.layout.element.Table;
+import com.itextpdf.layout.property.UnitValue;
 import com.kalex.generadordeordendeservicio.R;
+
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
@@ -43,19 +53,8 @@ import java.util.List;
 
 public class InicioFragment extends Fragment {
 
-    private EditText txtFolio;
-    private EditText txtMarca;
-    private EditText txtModelo;
-    private EditText txtColor;
-    private EditText txtKilometraje;
-    private EditText txtPlacas;
-    private EditText DateIngreso;
-    private EditText DateSalida;
-    private EditText txtNombre;
-    private EditText txtTelefono;
-    private EditText txtEmail;
-    private  EditText txtObservaciones;
-    private EditText txtNumerodeserie;
+    private EditText txtFolio, txtMarca, txtModelo, txtColor, txtKilometraje, txtPlacas, DateIngreso, DateSalida, txtNombre, txtTelefono, txtEmail, txtObservaciones, txtNumerodeserie, txtCantidad, txtDescripciontrabajo, txtCosto;
+
     private CheckBox checkBox1, checkBox2, checkBox3, checkBox4, checkBox5, checkBox6, checkBox7, checkBox8, checkBox9, checkBox10, checkBox11, checkBox12, checkBox13, checkBox14, checkBox15, checkBox16;
     private SeekBar seekBar;
     private ImageButton botonLadoderecho, botonLadoizquierdo, botonFrente, botonDetras;
@@ -65,6 +64,7 @@ public class InicioFragment extends Fragment {
 
     private static final int CODIGO_SOLICITUD_PERMISO_CAMARA = 100;
     private static final int CODIGO_SOLICITUD_CAMARA = 1;
+    private boolean todasLasImagenesTomadas = false;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -83,6 +83,10 @@ public class InicioFragment extends Fragment {
         txtNombre = rootView.findViewById(R.id.txtNombre);
         txtTelefono = rootView.findViewById(R.id.txtTelefono);
         txtEmail = rootView.findViewById(R.id.txtEmail);
+
+        txtCantidad = rootView.findViewById(R.id.txtCantidad);
+        txtDescripciontrabajo = rootView.findViewById(R.id.txtDescripciontrabajo);
+        txtCosto = rootView.findViewById(R.id.txtCosto);
 
         txtObservaciones = rootView.findViewById(R.id.txtObservaciones);
 
@@ -214,28 +218,49 @@ public class InicioFragment extends Fragment {
             Bundle extras = data.getExtras();
             Bitmap imagenBitmap = (Bitmap) extras.get("data");
             imagenActual.setImageBitmap(imagenBitmap);
+            // Verificar si todas las imágenes han sido tomadas
+            if (imgLadoderecho.getDrawable() != null &&
+                    imgLadoizquierdo.getDrawable() != null &&
+                    imgFrente.getDrawable() != null &&
+                    imgDetras.getDrawable() != null) {
+                todasLasImagenesTomadas = true;
+            }
         }
     }
 
-    private void agregarImagenAlPDF(Document document, ImageView imageView) {
+    private void agregarImagenACelda(Table table, ImageView imageView, float widthPercent, float heightPercent) {
         Drawable drawable = imageView.getDrawable();
         Bitmap imagenBitmap = ((BitmapDrawable) drawable).getBitmap();
 
+        // Redimensionar la imagen
+        int newWidth = (int) (imagenBitmap.getWidth() * widthPercent);
+        int newHeight = (int) (imagenBitmap.getHeight() * heightPercent);
+        Bitmap resizedBitmap = Bitmap.createScaledBitmap(imagenBitmap, newWidth, newHeight, true);
+
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
-        imagenBitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
+        resizedBitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
         byte[] byteArray = stream.toByteArray();
 
         com.itextpdf.layout.element.Image imagenPdf = new com.itextpdf.layout.element.Image(ImageDataFactory.create(byteArray));
-        document.add(imagenPdf);
-    }
 
+        // Crea una celda en la tabla y agrega la imagen a la celda
+        Cell cell = new Cell();
+        cell.add(imagenPdf);
+
+        // Agrega la celda a la tabla
+        table.addCell(cell);
+    }
 
 
     private void generateAndSavePDF() {
         if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(requireActivity(), new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
         } else {
-            createPDF();
+            if (todasLasImagenesTomadas) {
+                createPDF();
+            } else {
+                Toast.makeText(requireContext(), "Por favor, tome las fotos de los 4 angulos", Toast.LENGTH_SHORT).show();
+            }
         }
     }
 
@@ -254,35 +279,114 @@ public class InicioFragment extends Fragment {
             PdfDocument pdfDocument = new PdfDocument(pdfWriter);
             Document document = new Document(pdfDocument);
 
-            // Contenido de pdf
-            document.add(new Paragraph("Orden de Servicio"));
-            document.add(new Paragraph("Taller Mecanico"));
-            document.add(new Paragraph("Mcqueen"));
 
-            document.add(new Paragraph("Folio: " + txtFolio.getText().toString()));
+            //Contenido del PDF
 
-            document.add(new Paragraph("DATOS DEL VEHICULO"));
-            document.add(new Paragraph("Marca: "+ txtMarca.getText().toString()));
-            document.add(new Paragraph("Modelo: "+ txtModelo.getText().toString()));
-            document.add(new Paragraph("Color: "+ txtColor.getText().toString()));
-            document.add(new Paragraph("Kilometraje: "+ txtKilometraje.getText().toString()+" KM"));
-            document.add(new Paragraph("Placas: "+ txtPlacas.getText().toString()));
-            document.add(new Paragraph("Numero de serie: "+ txtNumerodeserie.getText().toString()));
+            // Crear una tabla con 3 filas y 3 columnas
+            Table table1 = new Table(UnitValue.createPercentArray(new float[]{1, 1, 1}));
 
-            document.add(new Paragraph("DATOS DEL CLIENTE"));
-            document.add(new Paragraph("Ingreso: "+ DateIngreso.getText().toString()));
-            document.add(new Paragraph("Salida: "+ DateSalida.getText().toString()));
-            document.add(new Paragraph("Nombre: "+ txtNombre.getText().toString()));
-            document.add(new Paragraph("Telefono: "+ txtTelefono.getText().toString()));
-            document.add(new Paragraph("Email: "+ txtEmail.getText().toString()));
+            // Agregar celdas a la tabla
+            table1.addCell("");
+            table1.addCell("Orden de servicio");
+            table1.addCell("Folio: " + txtFolio.getText().toString());
 
-            document.add(new Paragraph("DESCRIPCION DEL TRABAJO"));
-            
+            table1.addCell("");
+            table1.addCell("Taller Mecanico Mcqueen");
+            table1.addCell("");
 
-            document.add(new Paragraph("OBSERVACIONES"));
-            document.add(new Paragraph(txtObservaciones.getText().toString()));
+            table1.setWidth(UnitValue.createPercentValue(100));
 
-            document.add(new Paragraph("INVENTARIO"));
+            // Agregar la tabla al documento
+            document.add(table1);
+
+            //----------------------------------------------------
+
+            Table table2 = new Table(UnitValue.createPercentArray(new float[]{1, 1}));
+
+            // Agregar celdas a la tabla
+            table2.addCell("DATOS DEL VEHICULO");
+            table2.addCell("DATOS DEL CLIENTE");
+            table2.addCell("Marca: " + txtMarca.getText().toString());
+            table2.addCell("Ingreso: " + DateIngreso.getText().toString());
+            table2.addCell("Modelo: " + txtModelo.getText().toString() + "Color: " + " " + txtColor.getText().toString());
+            table2.addCell("Salida: " + DateSalida.getText().toString());
+            table2.addCell("Kilometraje: " + txtKilometraje.getText().toString() + " KM" + " " + "Placas: " + txtPlacas.getText().toString());
+            table2.addCell("Nombre: " + txtNombre.getText().toString());
+            table2.addCell("Numero de serie: " + txtNumerodeserie.getText().toString());
+            table2.addCell("Telefono: " + txtTelefono.getText().toString());
+            table2.addCell("");
+            table2.addCell("Email: " + txtEmail.getText().toString());
+
+            table2.setWidth(UnitValue.createPercentValue(100));
+
+            // Agregar la tabla al documento
+            document.add(table2);
+
+            //---------------------------------------------------------------------------------------
+            // Crear una tabla con 3 filas y 3 columnas
+            Table table3 = new Table(4);
+
+            // Agregar celdas a la tabla
+            table3.addCell("CANTIDAD");
+            table3.addCell("DESCRIPCION DEL TRABAJO");
+            table3.addCell("COSTO");
+            table3.addCell("IMPORTE");
+
+            table3.addCell(txtCantidad.getText().toString());
+            table3.addCell(txtDescripciontrabajo.getText().toString());
+            table3.addCell("$" + txtCosto.getText().toString());
+
+            String cantidad = txtCantidad.getText().toString();
+            String costo = txtCosto.getText().toString();
+
+            // Convertir las cadenas a valores numéricos (double)
+            double Vcantidad = Double.parseDouble(cantidad);
+            double Vcosto = Double.parseDouble(costo);
+
+            // Calcular el resultado de la multiplicación
+            double resultadoImporte = Vcantidad * Vcosto;
+
+            table3.addCell("$" + (resultadoImporte));
+
+            table3.addCell("");
+            table3.addCell("");
+            table3.addCell("TOTAL: ");
+            table3.addCell("$" + (resultadoImporte));
+
+            table3.setWidth(UnitValue.createPercentValue(100));
+
+            // Agregar la tabla al documento
+            document.add(table3);
+
+            //---------------------------------------------------------------------------------------
+
+            Table table4 = new Table(1);
+
+            // Agregar celdas a la tabla
+
+            table4.addCell("OBSERVACIONES");
+            table4.addCell(txtObservaciones.getText().toString());
+
+            table4.setWidth(UnitValue.createPercentValue(100));
+
+            // Agregar la tabla al documento
+            document.add(table4);
+
+            //---------------------------------------------------------------------------------------
+
+            Table table5 = new Table(1);
+
+            // Agregar celdas a la tabla
+
+            table5.addCell("INVENTARIO");
+
+            table5.setWidth(UnitValue.createPercentValue(100));
+
+            // Agregar la tabla al documento
+            document.add(table5);
+
+            //---------------------------------------------------------------------
+            Table table6 = new Table(UnitValue.createPercentArray(new float[]{1, 1, 1, 1}));
             // Agregar los elementos seleccionados a la lista
             List<String> elementosSeleccionados = new ArrayList<>();
             if (checkBox1.isChecked()) {
@@ -334,30 +438,87 @@ public class InicioFragment extends Fragment {
                 elementosSeleccionados.add(checkBox16.getText().toString());
             }
 
-            // Agregar los elementos seleccionados al documento
             for (String elemento : elementosSeleccionados) {
-                document.add(new Paragraph(elemento));
+                table6.addCell(elemento);
             }
-            document.add(new Paragraph("El nivel de gasolina es: "+ seekBar.getProgress() + "%"));
 
-            document.add(new Paragraph("DAÑOS PREEXISTENTES EN EL VEHICULO"));
-            // Agregar imágenes al PDF
-            document.add(new Paragraph("Lado derecho"));
-            agregarImagenAlPDF(document, imgLadoderecho);
-            document.add(new Paragraph("Lado izquierdo"));
-            agregarImagenAlPDF(document, imgLadoizquierdo);
-            document.add(new Paragraph("Frente"));
-            agregarImagenAlPDF(document, imgFrente);
-            document.add(new Paragraph("Detras"));
-            agregarImagenAlPDF(document, imgDetras);
 
-            document.add(new Paragraph("___________________________"));
-            document.add(new Paragraph("Dueño del taller mecanico"));
+            table6.setWidth(UnitValue.createPercentValue(100));
 
-            document.add(new Paragraph("___________________________"));
-            document.add(new Paragraph(txtNombre.getText().toString()));
+            // Agregar la tabla al documento
+            document.add(table6);
+            //---------------------------------------------------------------------------------------
 
-            document.add(new Paragraph("Ampliación Ejido San Fco. S/N, Monte Hermón, 41304 Tlapa, Gro."));
+            Table table7 = new Table(1);
+
+            // Agregar celdas a la tabla
+
+            table7.addCell("El nivel de gasolina es: " + seekBar.getProgress() + "%");
+
+            table7.setWidth(UnitValue.createPercentValue(100));
+
+            // Agregar la tabla al documento
+            document.add(table7);
+            //---------------------------------------------------------------------------------------
+
+            Table table8 = new Table(1);
+
+            // Agregar celdas a la tabla
+
+            table8.addCell("DAÑOS PREEXISTENTES EN EL VEHICULO");
+
+            table8.setWidth(UnitValue.createPercentValue(100));
+
+            // Agregar la tabla al documento
+            document.add(table8);
+            //---------------------------------------------------------------------------------------
+
+            Table table9 = new Table(UnitValue.createPercentArray(new float[]{1, 1, 1, 1}));
+
+            // Agregar celdas a la tabla
+
+            table9.addCell("Lado derecho");
+            table9.addCell("Lado izquierdo");
+            table9.addCell("Frente");
+            table9.addCell("Detras");
+
+            agregarImagenACelda(table9, imgLadoderecho, 0.6f, 0.6f);
+            agregarImagenACelda(table9, imgLadoizquierdo, 0.6f, 0.6f);
+            agregarImagenACelda(table9, imgFrente, 0.6f, 0.6f);
+            agregarImagenACelda(table9, imgDetras, 0.6f, 0.6f);
+
+            table9.setWidth(UnitValue.createPercentValue(100));
+
+            // Agregar la tabla al documento
+            document.add(table9);
+            //---------------------------------------------------------------------------------------
+
+            Table table10 = new Table(2);
+
+            // Agregar celdas a la tabla
+
+            table10.addCell("\n____________________________\n" + "Dueño del taller mecanico");
+            table10.addCell("\n____________________________\n" + txtNombre.getText().toString());
+
+            table10.setWidth(UnitValue.createPercentValue(100));
+
+            // Agregar la tabla al documento
+            document.add(table10);
+
+            //---------------------------------------------------------------------------------------
+
+            Table table11 = new Table(1);
+
+            // Agregar celdas a la tabla
+
+            table11.addCell("Ampliación Ejido San Fco. S/N, Monte Hermón, 41304 Tlapa, Gro.");
+
+            table11.setWidth(UnitValue.createPercentValue(100));
+
+            // Agregar la tabla al documento
+            document.add(table11);
+
+            //----------------------------------------------------
 
             document.close();
             openPDF(filePath);
@@ -383,7 +544,6 @@ public class InicioFragment extends Fragment {
             }
         }
     }
-
 
 
 }
