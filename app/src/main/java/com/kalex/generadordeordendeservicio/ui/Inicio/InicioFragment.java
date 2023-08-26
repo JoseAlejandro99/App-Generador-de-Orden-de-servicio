@@ -1,4 +1,4 @@
-package com.kalex.generadordeordendeservicio.ui.home;
+package com.kalex.generadordeordendeservicio.ui.Inicio;
 
 import android.Manifest;
 import android.app.Activity;
@@ -31,14 +31,10 @@ import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
 
 import com.itextpdf.io.image.ImageDataFactory;
-import com.itextpdf.kernel.colors.ColorConstants;
 import com.itextpdf.kernel.pdf.PdfDocument;
 import com.itextpdf.kernel.pdf.PdfWriter;
 import com.itextpdf.layout.Document;
-import com.itextpdf.layout.borders.Border;
-import com.itextpdf.layout.borders.SolidBorder;
 import com.itextpdf.layout.element.Cell;
-import com.itextpdf.layout.element.Div;
 import com.itextpdf.layout.element.Paragraph;
 import com.itextpdf.layout.element.Table;
 import com.itextpdf.layout.property.HorizontalAlignment;
@@ -348,7 +344,7 @@ public class InicioFragment extends Fragment {
 
             // Crear una tabla con 3 filas y 3 columnas
             Table table1 = new Table(UnitValue.createPercentArray(new float[]{1, 1, 1}));
-            table1.setBorder(Border.NO_BORDER);
+
 
             // Agregar celdas a la tabla
             table1.addCell("");

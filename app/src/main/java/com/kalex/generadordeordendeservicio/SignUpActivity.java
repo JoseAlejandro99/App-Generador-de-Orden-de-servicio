@@ -42,8 +42,7 @@ public class SignUpActivity extends AppCompatActivity {
     private void agregarUsuario() {
         // Obtener los valores de los campos de entrada
         String nombreCompleto = nombreCompletoEditText.getText().toString().trim();
-        String telefonoStr = telefonoEditText.getText().toString().trim();
-        long telefono = (telefonoStr.isEmpty()) ? 0 : Long.parseLong(telefonoStr);
+        String telefono = telefonoEditText.getText().toString().trim();
         String usuario = usuarioEditText.getText().toString().trim();
         String contraseña = contraseñaEditText.getText().toString();
         String confirmarContraseña = confirmarContraseñaEditText.getText().toString();
@@ -55,20 +54,14 @@ public class SignUpActivity extends AppCompatActivity {
         // Verificar si las contraseñas coinciden
         if (contraseña.equals(confirmarContraseña)) {
             if (!nombreCompleto.isEmpty() && !usuario.isEmpty() && !contraseña.isEmpty()) {
-                // Insertar el usuario en la base de datos
-                long insertedRow = databaseHelper.insertUser(nombreCompleto, telefono, usuario, contraseña, nivelUsuario);
+                // Aquí debes llamar al método de inserción en tu base de datos
+                long resultado = databaseHelper.insertUser(nombreCompleto, telefono, usuario, contraseña, nivelUsuario);
 
-                if (insertedRow != -1) {
+                if (resultado != -1) {
                     Toast.makeText(this, "Usuario agregado correctamente", Toast.LENGTH_SHORT).show();
-                    // Limpiar los campos de entrada
-                    nombreCompletoEditText.getText().clear();
-                    telefonoEditText.getText().clear();
-                    usuarioEditText.getText().clear();
-                    contraseñaEditText.getText().clear();
-                    confirmarContraseñaEditText.getText().clear();
                     finish();
                 } else {
-                    Toast.makeText(this, "Error al agregar usuario", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, "Error al agregar el usuario", Toast.LENGTH_SHORT).show();
                 }
             } else {
                 Toast.makeText(this, "Por favor, complete todos los campos obligatorios", Toast.LENGTH_SHORT).show();

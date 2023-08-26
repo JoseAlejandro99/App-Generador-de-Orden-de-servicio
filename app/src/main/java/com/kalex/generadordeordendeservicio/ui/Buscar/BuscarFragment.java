@@ -1,4 +1,4 @@
-package com.kalex.generadordeordendeservicio.ui.dashboard;
+package com.kalex.generadordeordendeservicio.ui.Buscar;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;

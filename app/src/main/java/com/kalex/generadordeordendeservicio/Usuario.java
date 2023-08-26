@@ -3,12 +3,12 @@ package com.kalex.generadordeordendeservicio;
 public class Usuario {
     private int id;
     private String nombreCompleto;
-    private int telefono;
+    private String telefono;
     private String usuario;
     private String contraseña;
     private int nivelUsuario;
 
-    public Usuario(int id, String nombreCompleto, int telefono, String usuario, String contraseña, int nivelUsuario) {
+    public Usuario(int id, String nombreCompleto, String telefono, String usuario, String contraseña, int nivelUsuario) {
         this.id = id;
         this.nombreCompleto = nombreCompleto;
         this.telefono = telefono;
@@ -17,15 +17,13 @@ public class Usuario {
         this.nivelUsuario = nivelUsuario;
     }
 
-    public int getId() {
-        return id;
-    }
+    public int getId() { return id; }
 
     public String getNombreCompleto() {
         return nombreCompleto;
     }
 
-    public int getTelefono() {
+    public String getTelefono() {
         return telefono;
     }
 

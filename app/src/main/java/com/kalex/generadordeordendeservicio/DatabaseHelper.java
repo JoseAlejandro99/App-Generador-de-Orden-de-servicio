@@ -5,6 +5,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,7 +27,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             "CREATE TABLE " + TABLE_USERS + " (" +
                     COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
                     COLUMN_FULL_NAME + " TEXT, " +
-                    COLUMN_PHONE + " LONG, " +
+                    COLUMN_PHONE + " TEXT, " +
                     COLUMN_USERNAME + " TEXT NOT NULL, " +
                     COLUMN_PASSWORD + " TEXT NOT NULL, " +
                     COLUMN_USER_LEVEL + " INTEGER)";
@@ -38,7 +39,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
         db.execSQL(CREATE_TABLE_USERS);
-        insertInitialUser(db, "admin", "12345");
+        insertInitialUser(db, "ADMINISTRADOR", "0000000000","admin", "12345",1);
     }
 
     @Override
@@ -47,17 +48,17 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         onCreate(db);
     }
 
-    private void insertInitialUser(SQLiteDatabase db, String username, String password) {
+    private void insertInitialUser(SQLiteDatabase db, String nombreCompleto, String telefono, String usuario, String contraseña, int nivelUsuario) {
         ContentValues values = new ContentValues();
-        values.put(COLUMN_FULL_NAME, "Administrador");
-        values.put(COLUMN_PHONE, 1112223344);
-        values.put(COLUMN_USERNAME, username);
-        values.put(COLUMN_PASSWORD, password);
-        values.put(COLUMN_USER_LEVEL, 1);
+        values.put(COLUMN_FULL_NAME, nombreCompleto);
+        values.put(COLUMN_PHONE, telefono);
+        values.put(COLUMN_USERNAME, usuario);
+        values.put(COLUMN_PASSWORD, contraseña);
+        values.put(COLUMN_USER_LEVEL, nivelUsuario);
         db.insert(TABLE_USERS, null, values);
     }
 
-    public long insertUser(String nombreCompleto, long telefono, String usuario, String contraseña, int nivelUsuario) {
+    public long insertUser(String nombreCompleto, String telefono, String usuario, String contraseña, int nivelUsuario) {
         SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues values = new ContentValues();
@@ -67,6 +68,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         values.put(COLUMN_PASSWORD, contraseña);
         values.put(COLUMN_USER_LEVEL, nivelUsuario);
 
+        // Insertar el nuevo usuario en la tabla
         return db.insert(TABLE_USERS, null, values);
     }
 
@@ -98,12 +100,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             while (cursor.moveToNext()) {
                 int id = cursor.getInt(idIndex);
                 String nombreCompleto = cursor.getString(nombreIndex);
-                long telefono = cursor.getLong(telefonoIndex);
+                String telefono = cursor.getString(telefonoIndex);
                 String usuario = cursor.getString(usuarioIndex);
                 String contraseña = cursor.getString(contraseñaIndex);
                 int nivelUsuario = cursor.getInt(nivelUsuarioIndex);
 
-                Usuario usuarioObj = new Usuario(id, nombreCompleto, (int) telefono, usuario, contraseña, nivelUsuario);
+                Usuario usuarioObj = new Usuario(id, nombreCompleto, telefono, usuario, contraseña, nivelUsuario);
                 usuarios.add(usuarioObj);
             }
             cursor.close();
@@ -111,6 +113,41 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         return usuarios;
     }
+
+    public void eliminarUsuario(int idUsuario) {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        // Define la cláusula WHERE para eliminar el usuario por su ID
+        String selection = COLUMN_ID + " = ?";
+        String[] selectionArgs = {String.valueOf(idUsuario)};
+
+        // Elimina el usuario de la base de datos
+        db.delete(TABLE_USERS, selection, selectionArgs);
+
+        db.close();
+    }
+
+    // Agrega este método a tu clase DatabaseHelper para obtener el nivel de usuario
+    public int obtenerNivelUsuario(String username) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        String[] projection = {COLUMN_USER_LEVEL};
+        String selection = COLUMN_USERNAME + " = ?";
+        String[] selectionArgs = {username};
+
+        Cursor cursor = db.query(TABLE_USERS, projection, selection, selectionArgs, null, null, null);
+        int nivelUsuario = -1; // Valor predeterminado en caso de que no se encuentre el usuario
+
+        if (cursor != null && cursor.moveToFirst()) {
+            nivelUsuario = cursor.getInt(cursor.getColumnIndex(COLUMN_USER_LEVEL));
+            cursor.close();
+        }
+
+        // Agregar líneas de Log.d para imprimir información en el registro
+        Log.d("DatabaseHelper", " Usuario: " + username + ", Nivel: " + nivelUsuario);
+
+        return nivelUsuario;
+    }
+
 
 
 }

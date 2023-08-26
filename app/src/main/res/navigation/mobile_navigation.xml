@@ -7,19 +7,19 @@
 
     <fragment
         android:id="@+id/navigation_home"
-        android:name="com.kalex.generadordeordendeservicio.ui.home.InicioFragment"
+        android:name="com.kalex.generadordeordendeservicio.ui.Inicio.InicioFragment"
         android:label="@string/title_home"
         tools:layout="@layout/fragment_inicio" />
 
     <fragment
         android:id="@+id/navigation_dashboard"
-        android:name="com.kalex.generadordeordendeservicio.ui.dashboard.BuscarFragment"
+        android:name="com.kalex.generadordeordendeservicio.ui.Buscar.BuscarFragment"
         android:label="@string/title_dashboard"
         tools:layout="@layout/fragment_buscar" />
 
     <fragment
         android:id="@+id/navigation_notifications"
-        android:name="com.kalex.generadordeordendeservicio.ui.notifications.UsuariosFragment"
+        android:name="com.kalex.generadordeordendeservicio.ui.Usuario.UsuariosFragment"
         android:label="@string/title_notifications"
         tools:layout="@layout/fragment_usuarios" />
 </navigation>

@@ -1,17 +1,18 @@
 package com.kalex.generadordeordendeservicio;
 
-import android.os.Bundle;
+        import android.content.Intent;
+        import android.os.Bundle;
+        import android.util.Log;
 
-import com.google.android.material.bottomnavigation.BottomNavigationView;
+        import androidx.appcompat.app.AppCompatActivity;
+        import androidx.appcompat.widget.Toolbar;
+        import androidx.navigation.NavController;
+        import androidx.navigation.Navigation;
+        import androidx.navigation.ui.AppBarConfiguration;
+        import androidx.navigation.ui.NavigationUI;
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-import androidx.navigation.NavController;
-import androidx.navigation.Navigation;
-import androidx.navigation.ui.AppBarConfiguration;
-import androidx.navigation.ui.NavigationUI;
-
-import com.kalex.generadordeordendeservicio.databinding.ActivityPrincipalBinding;
+        import com.google.android.material.bottomnavigation.BottomNavigationView;
+        import com.kalex.generadordeordendeservicio.databinding.ActivityPrincipalBinding;
 
 public class Activity_Principal extends AppCompatActivity {
 
@@ -28,9 +29,27 @@ public class Activity_Principal extends AppCompatActivity {
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        // Obtener el nivel de usuario desde el Intent
+        int nivelUsuario = getIntent().getIntExtra("nivelUsuario", 0);
+        Log.d("Activity_Principal", "Nivel de usuario: " + nivelUsuario);
+
+
         BottomNavigationView navView = findViewById(R.id.nav_view);
-        // Passing each menu ID as a set of Ids because each
-        // menu should be considered as top level destinations.
+
+        // Configurar opciones de menú según el nivel de usuario
+        if (nivelUsuario == 1) {
+            // Inflar el menú para el nivel de usuario 1
+            navView.inflateMenu(R.menu.bottom_nav_menu_nivel1);
+        } else if (nivelUsuario == 2) {
+            // Inflar el menú para el nivel de usuario 2
+            navView.inflateMenu(R.menu.bottom_nav_menu_nivel2);
+        } else {
+            Log.d("Activity_principal", "Error al verificar el nivel de usuario");
+        }
+
+
+        // Pasar cada ID de menú como un conjunto de IDs porque cada
+        // menú debe considerarse como destinos de nivel superior.
         AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(
                 R.id.navigation_home, R.id.navigation_dashboard, R.id.navigation_notifications)
                 .build();
@@ -40,3 +59,4 @@ public class Activity_Principal extends AppCompatActivity {
     }
 
 }
+
